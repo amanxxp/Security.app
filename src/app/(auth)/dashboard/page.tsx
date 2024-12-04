@@ -13,15 +13,32 @@ interface CustomError {
   };
 }
 
-
 const DashboardPage = () => {
   const [loadingEndpoint, setLoadingEndpoint] = useState<string | null>(null);
+  const [userDetails, setUserDetails] = useState<{
+    name: string;
+    role: string;
+  } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+
     if (!token) {
       router.push("/login");
+      return;
+    }
+
+    if (user) {
+      try {
+        setUserDetails(JSON.parse(user));
+      } catch (error) {
+        console.error(
+          "Failed to parse user details from local storage:",
+          error
+        );
+      }
     }
   }, [router]);
 
@@ -44,13 +61,13 @@ const DashboardPage = () => {
         duration: 3000,
       });
     } catch (error: unknown) {
-      const errorMessage = 
-        (error as CustomError)?.response?.data?.message || "Failed to access the service";
+      const errorMessage =
+        (error as CustomError)?.response?.data?.message ||
+        "Failed to access the service";
       toast.error(errorMessage, {
         position: "top-right",
         duration: 3000,
       });
-    
     } finally {
       // Reset loading state
       setLoadingEndpoint(null);
@@ -64,6 +81,7 @@ const DashboardPage = () => {
       duration: 1500,
       onAutoClose: () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
         router.push("/login");
       },
     });
@@ -81,29 +99,29 @@ const DashboardPage = () => {
       <Toaster richColors />
 
       <div className="w-full p-8">
-        <h1 className="text-3xl font-bold mb-8">Welcome to your Dashboard!</h1>
+        <h1 className="text-3xl font-bold mb-4">Welcome to your Dashboard!</h1>
+        {userDetails && (
+          <div className="mb-8">
+            <p className="text-lg">
+              Username:{" "}
+              <span className="font-semibold">{userDetails.name}</span>
+            </p>
+            <p className="text-lg">
+              Role: <span className="font-semibold">{userDetails.role}</span>
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4 max-w-xl">
           {ENDPOINTS.map((item) => (
             <button
               key={item.endpoint}
               onClick={() => checkPower(item.endpoint)}
-              className={`
-                p-4 
-                bg-green-500 
-                rounded-md 
-                text-white 
-                font-semibold 
-                flex 
-                items-center 
-                justify-center
-                relative
-                ${
-                  loadingEndpoint === item.endpoint
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-green-600"
-                }
-              `}
+              className={`p-4 bg-green-500 rounded-md text-white font-semibold flex items-center justify-center relative ${
+                loadingEndpoint === item.endpoint
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-600"
+              }`}
               disabled={loadingEndpoint === item.endpoint}
             >
               {loadingEndpoint === item.endpoint ? (
@@ -138,17 +156,7 @@ const DashboardPage = () => {
 
       <button
         onClick={handleLogout}
-        className="
-          absolute 
-          top-4 
-          right-4 
-          bg-red-600 
-          text-white 
-          p-4 
-          rounded-2xl 
-          hover:bg-red-700 
-          transition-colors
-        "
+        className="absolute top-4 right-4 bg-red-600 text-white p-4 rounded-2xl hover:bg-red-700 transition-colors"
       >
         Logout
       </button>
