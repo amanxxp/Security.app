@@ -17,6 +17,6 @@ export async function POST(req: NextRequest) {
     data: { name, email, password: hashedPassword, role },
   });
 
-  const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '1h' });
+  const token = jwt.sign({ id: user.id,name:user.name, role: user.role }, secret, { expiresIn: '1h' });
   return NextResponse.json({ token, user });
 }
