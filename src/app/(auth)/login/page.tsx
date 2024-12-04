@@ -42,7 +42,7 @@ const LoginPage = () => {
         }
       });
     } catch (err) {
-      toast.error("Something went wrong. Please try again.", {
+      toast.error(`Something went wrong. Please try again.${err}`, {
         position: "top-right",
         duration: 3000,
       });

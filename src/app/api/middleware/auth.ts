@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
 const secret = process.env.JWT_SECRET || 'secret';
+interface DecodedToken {
+  role: string;
+  // Add other properties if your token includes more fields, e.g., userId, exp, etc.
+}
+
 
 export async function auth(req: NextRequest, validRoles: string[]) {
 
@@ -20,7 +25,7 @@ export async function auth(req: NextRequest, validRoles: string[]) {
 
   try {
     // Verify the JWT token
-    const decoded: any = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, secret) as DecodedToken;
     const role = decoded.role;
 
     // Validate role

@@ -5,8 +5,16 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Toaster, toast } from "sonner";
 
+interface CustomError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
+
 const DashboardPage = () => {
-  const [user, setUser] = useState(null);
   const [loadingEndpoint, setLoadingEndpoint] = useState<string | null>(null);
   const router = useRouter();
 
@@ -35,15 +43,14 @@ const DashboardPage = () => {
         position: "top-right",
         duration: 3000,
       });
-    } catch (error: any) {
-      // Error toast
-      toast.error(
-        error.response?.data?.message || "Failed to access the service",
-        {
-          position: "top-right",
-          duration: 3000,
-        }
-      );
+    } catch (error: unknown) {
+      const errorMessage = 
+        (error as CustomError)?.response?.data?.message || "Failed to access the service";
+      toast.error(errorMessage, {
+        position: "top-right",
+        duration: 3000,
+      });
+    
     } finally {
       // Reset loading state
       setLoadingEndpoint(null);

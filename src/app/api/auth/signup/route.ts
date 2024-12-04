@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET || 'secret';
 
 export async function POST(req: NextRequest) {
-  const { name, email, password, phone, role } = await req.json();
+  const { name, email, password, role } = await req.json();
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) return NextResponse.json({ message: "User already exists" }, { status: 400 });
